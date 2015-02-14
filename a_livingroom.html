@@ -1,0 +1,84 @@
+<html>
+	<head>
+		<title>My livingroom app</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+        <div id="container"></div>
+		<script src="js/three.min.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/Detector.js"></script>
+		<script>
+			// Our Javascript will go here.
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+            var camera, scene, controls, renderer;
+
+            init();
+            addToDOM();
+            animate();
+            render();
+
+			function animate() {
+				requestAnimationFrame(animate);
+				controls.update();
+			}
+
+            function addToDOM() {
+                var container = document.getElementById('container');
+                container.appendChild( renderer.domElement );
+            }
+
+            function init() {
+                var wallHeight = 1000;
+                var wallThickness = 40;
+                var sideWallLength = 2000;
+                var endWallLength = 1000;
+
+                // Camera.
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera( 60, window.innerWidth/window.innerHeight, 0.1, 10000 );
+                camera.position.z = wallHeight * 3;
+
+                // Renderer.
+                renderer = new THREE.WebGLRenderer( { antialias: true } );
+                renderer.setSize( window.innerWidth, window.innerHeight );
+
+                // Top and bottom side walls.
+                var sideWallGeometry = new THREE.BoxGeometry( sideWallLength, wallThickness, wallHeight );
+                var material = new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true } );
+                var topSideWall = new THREE.Mesh( sideWallGeometry, material );
+    			var bottomSideWall = new THREE.Mesh( sideWallGeometry, material );
+                topSideWall.position.y = ( endWallLength + wallThickness )/2;
+                bottomSideWall.position.y = -( endWallLength + wallThickness )/2;
+                scene.add( topSideWall, bottomSideWall );
+
+                // Left and right side walls.
+                var endWallGeometry = new THREE.BoxGeometry( endWallLength, wallThickness, wallHeight );
+                var leftEndWall = new THREE.Mesh( endWallGeometry, material );
+                var rightEndWall = new THREE.Mesh( endWallGeometry, material );
+                leftEndWall.rotation.z = 90 * Math.PI/180;
+                rightEndWall.rotation.z = -90 * Math.PI/180;
+                leftEndWall.position.x = -( sideWallLength + wallThickness )/2;
+                rightEndWall.position.x = ( sideWallLength + wallThickness )/2;
+                scene.add( leftEndWall, rightEndWall );
+
+                // TODO Floor.
+
+                // CONTROLS
+                controls = new THREE.OrbitControls( camera );
+                controls.damping = 0.2;
+                controls.addEventListener( 'change', render );
+
+            }
+
+			function render() {
+				renderer.render( scene, camera );
+			}
+
+		</script>
+	</body>
+</html>
