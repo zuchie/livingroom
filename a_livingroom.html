@@ -15,9 +15,12 @@
 			// Our Javascript will go here.
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-            var camera, scene, controls, renderer;
+            var camera, scene, light, ambientLight, controls, renderer;
+            // Shared by camera. 
+            var wallHeight = 1000;
 
             init();
+            fillScene();
             addToDOM();
             animate();
             render();
@@ -32,25 +35,62 @@
                 container.appendChild( renderer.domElement );
             }
 
+            function fillScene() {
+                scene = new THREE.Scene();
+//                scene.fog = new THREE.Fog( 0x808080, 2000, 4000 );
+//                scene.add( camera );
+
+                // LIGHTS
+                scene.add( light );
+                scene.add( ambientLight );
+
+                // Add walls and floor into scene.
+                createWallsFloor();
+            }
+
             function init() {
-                var wallHeight = 1000;
+                // Camera.
+                camera = new THREE.PerspectiveCamera( 60, window.innerWidth/window.innerHeight, 0.1, 10000 );
+                camera.position.z = wallHeight * 3;
+
+                light = new THREE.DirectionalLight( 0xFFFFFF, 0.7 );
+                light.position.set( 1, 1, 1 );
+
+                ambientLight = new THREE.AmbientLight( 0x404040 );
+
+                // Renderer.
+                renderer = new THREE.WebGLRenderer( { antialias: true } );
+                renderer.setSize( window.innerWidth, window.innerHeight );
+                renderer.setClearColor( 0xAAAAAA, 1.0 );
+//                renderer.gammaInput = true;
+//                renderer.gammaOutput = true;
+
+                // CONTROLS
+                controls = new THREE.OrbitControls( camera );
+                controls.damping = 0.2;
+                controls.addEventListener( 'change', render );
+
+            }
+
+			function render() {
+				renderer.render( scene, camera );
+			}
+
+            function createWallsFloor() {
                 var wallThickness = 40;
                 var sideWallLength = 2000;
                 var endWallLength = 1000;
                 var floorThickness = wallThickness; 
 
-                // Camera.
-                scene = new THREE.Scene();
-                camera = new THREE.PerspectiveCamera( 60, window.innerWidth/window.innerHeight, 0.1, 10000 );
-                camera.position.z = wallHeight * 3;
-
-                // Renderer.
-                renderer = new THREE.WebGLRenderer( { antialias: true } );
-                renderer.setSize( window.innerWidth, window.innerHeight );
-
                 // Top and bottom side walls.
                 var sideWallGeometry = new THREE.BoxGeometry( sideWallLength, wallThickness, wallHeight );
-                var material = new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true } );
+                var material = new THREE.MeshLambertMaterial( { color: 0x8066FC, shading: THREE.FlatShading, wireframe: false } );
+/*
+                var newRed = material.color.r * 0.4;
+                var newGreen = material.color.g * 0.4;
+                var newBlue = material.color.b * 0.4;
+                material.ambient.setRGB( newRed, newGreen, newBlue );
+*/
                 var topSideWall = new THREE.Mesh( sideWallGeometry, material );
     			var bottomSideWall = new THREE.Mesh( sideWallGeometry, material );
                 topSideWall.position.y = ( endWallLength + wallThickness )/2;
@@ -67,9 +107,9 @@
                 rightEndWall.position.x = ( sideWallLength + wallThickness )/2;
                 scene.add( leftEndWall, rightEndWall );
 
-                // TODO Floor.
+                // Floor.
                 var floorGeometry = new THREE.BoxGeometry( sideWallLength, endWallLength, floorThickness );
-                var floorMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+                var floorMaterial = new THREE.MeshLambertMaterial( { color: 0xCCAA44, wireframe: false } );
                 var floor = new THREE.Mesh( floorGeometry, floorMaterial );
                 floor.position.z = -( wallHeight + floorThickness )/2; 
                 scene.add( floor );
@@ -80,17 +120,7 @@
 
                 // TODO Add a table on the floor, with textre, light, and shade.
 
-                // CONTROLS
-                controls = new THREE.OrbitControls( camera );
-                controls.damping = 0.2;
-                controls.addEventListener( 'change', render );
-
             }
-
-			function render() {
-				renderer.render( scene, camera );
-			}
-
 		</script>
 	</body>
 </html>
