@@ -85,17 +85,25 @@
                 var sideWallLength = 2000;
                 var endWallLength = 1000;
                 var floorThickness = wallThickness; 
+                var material;
 
                 // Top and bottom side walls.
                 var sideWallGeometry = new THREE.BoxGeometry( sideWallLength, wallThickness, wallHeight );
-                var material = new THREE.MeshPhongMaterial( { color: 0x8066FC, specular: 0x7F7F7F, shininess: 20 } );
+                // load a texture, set wrap mode to repeat
+                THREE.ImageUtils.crossOrigin = 'anonymous';
+                var texture = THREE.ImageUtils.loadTexture( 'http://localhost:8000/texture/brick_diffuse.jpg' );
+//                texture.wrapS = THREE.RepeatWrapping;
+//                texture.wrapT = THREE.RepeatWrapping;
+//                texture.repeat.set( 4, 4 );
+                material = new THREE.MeshBasicMaterial( { map: texture } );
 
+/*
                 // Add ambient color to Lambert material.
                 var newRed = material.color.r * 0.9;
                 var newGreen = material.color.g * 0.1;
                 var newBlue = material.color.b * 0.9;
                 material.ambient.setRGB( newRed, newGreen, newBlue );
-
+*/
                 var topSideWall = new THREE.Mesh( sideWallGeometry, material );
     			var bottomSideWall = new THREE.Mesh( sideWallGeometry, material );
                 topSideWall.position.y = ( endWallLength + wallThickness )/2;
