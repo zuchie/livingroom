@@ -51,7 +51,7 @@
             function init() {
                 // Camera.
                 camera = new THREE.PerspectiveCamera( 60, window.innerWidth/window.innerHeight, 0.1, 10000 );
-                camera.position.z = wallHeight * 3;
+                camera.position.z = wallHeight * 2;
 
                 // 2 directional lights to light all faces.
                 directLight1 = new THREE.DirectionalLight( 0xFFFFFF, 0.7 );
@@ -85,44 +85,68 @@
                 var sideWallLength = 2000;
                 var endWallLength = 1000;
                 var floorThickness = wallThickness; 
-                var material;
+                var wallMaterial;
+
+                // load a texture, set wrap mode to repeat
+                THREE.ImageUtils.crossOrigin = 'anonymous';
+                var wallTexture = THREE.ImageUtils.loadTexture( 'http://localhost:8000/texture/brick_diffuse.jpg' );
+                wallTexture.wrapS = THREE.RepeatWrapping;
+                wallTexture.wrapT = THREE.RepeatWrapping;
+                wallTexture.repeat.set( 4, 4 );
 
                 // Top and bottom side walls.
                 var sideWallGeometry = new THREE.BoxGeometry( sideWallLength, wallThickness, wallHeight );
-                // load a texture, set wrap mode to repeat
-                THREE.ImageUtils.crossOrigin = 'anonymous';
-                var texture = THREE.ImageUtils.loadTexture( 'http://localhost:8000/texture/brick_diffuse.jpg' );
-//                texture.wrapS = THREE.RepeatWrapping;
-//                texture.wrapT = THREE.RepeatWrapping;
-//                texture.repeat.set( 4, 4 );
-                material = new THREE.MeshBasicMaterial( { map: texture } );
-
+                wallMaterial = [
+                            new THREE.MeshLambertMaterial( { color: 0x400000 } ),
+                            new THREE.MeshLambertMaterial( { color: 0x004000 } ),
+                            new THREE.MeshLambertMaterial( { color: 0x404000 } ),
+                            new THREE.MeshLambertMaterial( { color: 0xFFFFFF, map: wallTexture } ),
+                            new THREE.MeshLambertMaterial( { color: 0x000040 } ),
+                            new THREE.MeshLambertMaterial( { color: 0x404040 } )
+                            ];
 /*
                 // Add ambient color to Lambert material.
-                var newRed = material.color.r * 0.9;
-                var newGreen = material.color.g * 0.1;
-                var newBlue = material.color.b * 0.9;
-                material.ambient.setRGB( newRed, newGreen, newBlue );
+                var newRed = wallMaterial.color.r * 0.9;
+                var newGreen = wallMaterial.color.g * 0.9;
+                var newBlue = wallMaterial.color.b * 0.9;
+                wallMaterial.ambient.setRGB( newRed, newGreen, newBlue );
 */
-                var topSideWall = new THREE.Mesh( sideWallGeometry, material );
-    			var bottomSideWall = new THREE.Mesh( sideWallGeometry, material );
+                sideWallGeometry.faces[0].materialIndex = 0;
+                sideWallGeometry.faces[1].materialIndex = 1;
+                sideWallGeometry.faces[2].materialIndex = 2;
+                sideWallGeometry.faces[3].materialIndex = 3;
+                sideWallGeometry.faces[4].materialIndex = 4;
+                sideWallGeometry.faces[5].materialIndex = 5;
+
+                var topSideWall = new THREE.Mesh( 
+                                        sideWallGeometry, 
+                                        new THREE.MeshFaceMaterial( wallMaterial )
+                                    );
+                var bottomSideWall = new THREE.Mesh( 
+                                        sideWallGeometry, 
+                                        new THREE.MeshFaceMaterial( wallMaterial )
+                                    );
+
                 topSideWall.position.y = ( endWallLength + wallThickness )/2;
+                // Rotate wall face with texture inside.
+                bottomSideWall.rotation.x = 180 * Math.PI / 180; 
                 bottomSideWall.position.y = -( endWallLength + wallThickness )/2;
                 scene.add( topSideWall, bottomSideWall );
-
+/*
                 // Left and right side walls.
                 var endWallGeometry = new THREE.BoxGeometry( endWallLength, wallThickness, wallHeight );
-                var leftEndWall = new THREE.Mesh( endWallGeometry, material );
-                var rightEndWall = new THREE.Mesh( endWallGeometry, material );
+                var leftEndWall = new THREE.Mesh( endWallGeometry, wallMaterial );
+                var rightEndWall = new THREE.Mesh( endWallGeometry, wallMaterial );
                 leftEndWall.rotation.z = 90 * Math.PI/180;
                 rightEndWall.rotation.z = -90 * Math.PI/180;
                 leftEndWall.position.x = -( sideWallLength + wallThickness )/2;
                 rightEndWall.position.x = ( sideWallLength + wallThickness )/2;
                 scene.add( leftEndWall, rightEndWall );
-
+*/
                 // Floor.
                 var floorGeometry = new THREE.BoxGeometry( sideWallLength, endWallLength, floorThickness );
-                var floorMaterial = new THREE.MeshPhongMaterial( { color: 0xCCAA44, specular: 0x7F7F7F, shininess: 40 } );
+                var floorTexture = THREE.ImageUtils.loadTexture( 'http://localhost:8000/texture/backgrounddetailed6.jpg' );
+                var floorMaterial = new THREE.MeshPhongMaterial( { color: 0xFFFFFF, map: floorTexture, specular: 0x7F7F7F, shininess: 40 } );
                 var floor = new THREE.Mesh( floorGeometry, floorMaterial );
                 floor.position.z = -( wallHeight + floorThickness )/2; 
                 scene.add( floor );
