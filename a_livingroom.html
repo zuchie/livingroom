@@ -97,12 +97,12 @@
                 // Top and bottom side walls.
                 var sideWallGeometry = new THREE.BoxGeometry( sideWallLength, wallThickness, wallHeight );
                 wallMaterial = [
-                            new THREE.MeshLambertMaterial( { color: 0x400000 } ),
-                            new THREE.MeshLambertMaterial( { color: 0x004000 } ),
-                            new THREE.MeshLambertMaterial( { color: 0x404000 } ),
+                            new THREE.MeshLambertMaterial( { color: 0xF00000 } ),
+                            new THREE.MeshLambertMaterial( { color: 0x00F000 } ),
+                            new THREE.MeshLambertMaterial( { color: 0x0000F0 } ),
                             new THREE.MeshLambertMaterial( { color: 0xFFFFFF, map: wallTexture } ),
-                            new THREE.MeshLambertMaterial( { color: 0x000040 } ),
-                            new THREE.MeshLambertMaterial( { color: 0x404040 } )
+                            new THREE.MeshLambertMaterial( { color: 0xF000F0 } ),
+                            new THREE.MeshLambertMaterial( { color: 0x00F0F0 } )
                             ];
 /*
                 // Add ambient color to Lambert material.
@@ -111,13 +111,14 @@
                 var newBlue = wallMaterial.color.b * 0.9;
                 wallMaterial.ambient.setRGB( newRed, newGreen, newBlue );
 */
+/*
                 sideWallGeometry.faces[0].materialIndex = 0;
                 sideWallGeometry.faces[1].materialIndex = 1;
                 sideWallGeometry.faces[2].materialIndex = 2;
                 sideWallGeometry.faces[3].materialIndex = 3;
                 sideWallGeometry.faces[4].materialIndex = 4;
                 sideWallGeometry.faces[5].materialIndex = 5;
-
+*/
                 var topSideWall = new THREE.Mesh( 
                                         sideWallGeometry, 
                                         new THREE.MeshFaceMaterial( wallMaterial )
